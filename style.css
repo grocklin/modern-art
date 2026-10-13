@@ -318,7 +318,13 @@ svg { display: block; }
   #bidRange { margin: 0; }
   body.mode-bid .hand-actions, body.mode-ok .hand-actions { display: none; }
   body.mode-bid .hand, body.mode-ok .hand { padding-top: 4px; }
-  body.mode-bid .me, body.mode-ok .me { display: none; }
+  /* while bidding, your money and bought paintings stay visible as one compact line */
+  body.mode-bid .me, body.mode-ok .me { grid-template-columns: auto 1fr; gap: 8px; }
+  body.mode-bid .me .avatar, body.mode-ok .me .avatar { display: none; }
+  body.mode-bid .me-info, body.mode-ok .me-info { display: flex; align-items: baseline; gap: 8px; }
+  body.mode-bid .me-name, body.mode-ok .me-name { font-size: 13px; }
+  body.mode-bid .me-money, body.mode-ok .me-money { font-size: 17px; }
+  body.mode-bid .me .chip, body.mode-ok .me .chip { padding: 2px 6px 2px 3px; font-size: 12px; }
   .auction-empty { display: none; }
   .auction-high .amount { font-size: 28px; }
   .auction-rule { display: none; }

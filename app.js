@@ -80,7 +80,17 @@
   let handMode = null, handResolve = null, selected = 0, hintCards = [], handModeAt = 0;
   let bidState = null; // {min,max,submit,label,fixed}
 
-  function setMode(m) { document.body.className = 'mode-' + m; renderPrompt(); }
+  // Keep CSS informed of the dock and sheet heights (the phone layout stacks the bid sheet on
+  // top of the hand dock). Measured on every mode change and render, on resize, and by a
+  // ResizeObserver: the observer alone doesn't fire while a page isn't being painted.
+  function syncLayout() {
+    const r = document.documentElement.style;
+    r.setProperty('--dock-h', $('#dock').offsetHeight + 'px');
+    r.setProperty('--sheet-h', $('#auction').offsetHeight + 'px');
+  }
+  const ro = new ResizeObserver(syncLayout);
+
+  function setMode(m) { document.body.className = 'mode-' + m; renderPrompt(); syncLayout(); }
 
   const ui = {
     pending: null,
@@ -90,6 +100,7 @@
       return new Promise((resolve, reject) => {
         this.pending = { reject };
         setup(v => { if (my !== token) return; this.pending = null; this.idle(); resolve(v); });
+        syncLayout();
       });
     },
     reset() {
@@ -316,6 +327,7 @@
     renderAuction();
     renderHand();
     renderPrompt();
+    syncLayout();
   }
 
   function renderPrompt() {
@@ -948,12 +960,9 @@
   }
 
   // Keep CSS informed of the dock and sheet heights (the phone layout stacks them).
-  const ro = new ResizeObserver(() => {
-    const r = document.documentElement.style;
-    r.setProperty('--dock-h', $('#dock').offsetHeight + 'px');
-    r.setProperty('--sheet-h', $('#auction').offsetHeight + 'px');
-  });
   ro.observe($('#dock')); ro.observe($('#auction'));
+  addEventListener('resize', syncLayout);
+  syncLayout();
 
   window.MA_DEBUG = () => G; // for console inspection
   window.MA_RENDER = () => render();
