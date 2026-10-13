@@ -8,14 +8,14 @@
   const AUCTION = {
     // 1 double: two stacked panels (an "=" sign)
     1: svg('<rect x="9" y="12" width="30" height="9" rx="2"/><rect x="9" y="27" width="30" height="9" rx="2"/>'),
-    // 2 hidden: a sealed bid — filled disc inside a ring
-    2: svg('<circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="10" fill="currentColor" stroke="none"/>'),
-    // 3 fixed price: $ in a diamond
-    3: svg('<path d="M24 5 43 24 24 43 5 24Z"/><path d="M29 18.5c-1-1.8-3-2.7-5-2.7-2.9 0-5 1.5-5 3.8 0 5.3 10.4 3 10.4 8.6 0 2.4-2.3 4-5.4 4-2.3 0-4.4-1-5.4-2.9M24 13v3M24 32v3" stroke-width="2.6"/>'),
-    // 4 once around: circular arrow in a diamond
-    4: svg('<path d="M24 5 43 24 24 43 5 24Z"/><path d="M30.5 20.5a7.5 7.5 0 1 0 .2 6.3" stroke-width="2.6"/><path d="M31.5 14.5v6.5H25" stroke-width="2.6"/>'),
-    // 5 open: four-way arrows in a circle
-    5: svg('<circle cx="24" cy="24" r="18"/><path d="M24 12v24M12 24h24M24 12l-4 4M24 12l4 4M24 36l-4-4M24 36l4-4M12 24l4-4M12 24l4 4M36 24l-4-4M36 24l-4 4" stroke-width="2.6"/>'),
+    // 2 hidden: a filled disc inside a ring that is open on the left
+    2: svg('<path d="M8.5 17.1A17 17 0 1 1 8.5 30.9"/><circle cx="24" cy="24" r="11.5" fill="currentColor" stroke="none"/>'),
+    // 3 fixed price: $ in a diamond, with the corners of a square showing behind it
+    3: svg('<path d="M24 4.5 43.5 24 24 43.5 4.5 24Z"/><path d="M17.9 10.6H10.6V17.9M30.1 10.6H37.4V17.9M37.4 30.1V37.4H30.1M10.6 30.1V37.4H17.9" stroke-width="2.4"/><path d="M24 8V40" stroke-width="2"/><path d="M29.5 18c-.9-1.9-2.9-3-5.4-3-3.2 0-5.4 1.7-5.4 4.2 0 5.9 11.2 3.4 11.2 9.6 0 2.6-2.4 4.4-5.8 4.4-2.6 0-4.8-1.1-5.8-3.2" stroke-width="2.8"/>'),
+    // 4 once around: in a diamond, a circle open at the right, arrowhead pointing down on the right
+    4: svg('<path d="M24 4.5 43.5 24 24 43.5 4.5 24Z"/><path d="M28.6 31.6A9 9 0 1 1 32.2 21.5" stroke-width="2.8"/><path d="M28.4 21.2H36L32.2 27.2Z" fill="currentColor" stroke-width="1.5"/>'),
+    // 5 open: four-way arrows with solid heads, in a circle
+    5: svg('<circle cx="24" cy="24" r="18"/><path d="M24 15V33M15 24H33" stroke-width="3"/><path d="M24 9.5 19.8 15.5H28.2ZM24 38.5 19.8 32.5H28.2ZM9.5 24 15.5 19.8V28.2ZM38.5 24 32.5 19.8V28.2Z" fill="currentColor" stroke-width="1.2"/>'),
   };
 
   const UI = {

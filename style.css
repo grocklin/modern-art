@@ -364,3 +364,13 @@ svg { display: block; }
 .log-player li.log-none { color: var(--ink-3); font-style: italic; }
 
 .dialog-body a { color: var(--ink); text-underline-offset: 3px; }
+
+/* deck distribution table */
+.table.deck { font-size: 13px; }
+.table.deck th { text-align: center; vertical-align: bottom; line-height: 1.2; }
+.table.deck th:first-child { text-align: left; }
+.table.deck td.num, .table.deck th.num { text-align: center; padding-left: 2px; padding-right: 2px; }
+.deck-ico { display: block; width: 22px; height: 22px; margin: 0 auto 3px; color: var(--ink); }
+.table.deck .chip { font-size: 12px; white-space: nowrap; }
+.table.deck tr.deck-total td { font-weight: 750; border-bottom: 0; }
+@media (max-width: 760px) { .table.deck th { font-size: 10px; } .table.deck .chip { font-size: 11px; padding: 2px 5px 2px 3px; } }

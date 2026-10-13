@@ -867,6 +867,19 @@
   }
   function flashInfo(t) { $('#promptText').textContent = t; }
 
+  // Paintings per artist and auction type, counted from the actual deck (cards 1–70).
+  function deckTableHTML() {
+    const n = [];
+    for (let a = 0; a <= 5; a++) n.push([0, 0, 0, 0, 0, 0]);
+    for (let c = 1; c <= 70; c++) { n[artist(c)][typeOf(c)]++; n[artist(c)][0]++; n[0][typeOf(c)]++; n[0][0]++; }
+    const types = [1, 2, 3, 4, 5];
+    const head = `<tr><th>Artist</th>${types.map(t => `<th class="num"><span class="deck-ico">${IC.AUCTION[t]}</span>${KIND[t]}</th>`).join('')}<th class="num">Total</th></tr>`;
+    const rows = [1, 2, 3, 4, 5].map(a => `<tr><td><span class="chip a${a}"><i></i>${ARTISTS[a]}</span></td>${types.map(t => `<td class="num">${n[a][t]}</td>`).join('')}<td class="num"><b>${n[a][0]}</b></td></tr>`).join('');
+    const foot = `<tr class="deck-total"><td>All</td>${types.map(t => `<td class="num">${n[0][t]}</td>`).join('')}<td class="num">${n[0][0]}</td></tr>`;
+    return `<table class="table deck">${head}${rows}${foot}</table>
+      <p class="fineprint">More paintings of an artist means that artist is more likely to reach five and end a round. Lite Metal has the fewest (12) but wins every tie, while Krypto has the most (16) but loses every tie.</p>`;
+  }
+
   const RULES = `
 <p>Buy and sell paintings by five artists. Whoever has the most money after four rounds wins. Everyone starts with $100, and other players' money is kept secret.</p>
 <h3>Your turn</h3><p>Auction one painting from your hand. If someone else wins it, they pay you. If you win your own painting, you pay the bank.</p>
@@ -879,7 +892,8 @@
 <p>If nobody bids, the auctioneer gets the painting free.</p>
 <h3>End of a round</h3><p>The round ends as soon as the 5th painting by one artist is played. That painting isn't auctioned, but it counts. The three artists with the most paintings played this round earn 30, 20 and 10; ties go to the artist further left. Every painting bought this round sells to the bank for its artist's value <i>added up over all rounds</i>, but only if that artist placed this round. The rest are worth nothing.</p>
 <p>Hands: 9 paintings in round 1, 4 more in rounds 2 and 3, and none in round 4.</p>
-<h3>Reading the board</h3><p>The bars under each artist count paintings played this round; the 5th ends the round. Badges show the current 1st, 2nd and 3rd. Chips show what each player has bought this round.</p>`;
+<h3>Reading the board</h3><p>The bars under each artist count paintings played this round; the 5th ends the round. Badges show the current 1st, 2nd and 3rd. Chips show what each player has bought this round.</p>
+<h3>Deck distribution</h3>${deckTableHTML()}`;
 
   function initControls() {
     buildStatic();
