@@ -367,7 +367,8 @@ svg { display: block; }
 
 /* deck distribution table */
 .table.deck { font-size: 13px; }
-.table.deck th { text-align: center; vertical-align: bottom; line-height: 1.2; }
+.table.deck th { text-align: center; vertical-align: top; line-height: 1.2; }
+.table.deck th:first-child, .table.deck th:last-child { vertical-align: bottom; }
 .table.deck th:first-child { text-align: left; }
 .table.deck td.num, .table.deck th.num { text-align: center; padding-left: 2px; padding-right: 2px; }
 .deck-ico { display: block; width: 22px; height: 22px; margin: 0 auto 3px; color: var(--ink); }
