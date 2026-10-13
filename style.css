@@ -310,10 +310,29 @@ svg { display: block; }
   body.mode-bid .auction, body.mode-ok .auction, body.mode-card .auction.active { transform: none; }
   .auction-body { gap: 9px; }
   /* the card(s) on the block look exactly like the hand cards */
-  .auction-lots .pcard.lg { --card-w: 52px; --card-h: 71px; padding: 5px 2px 4px; }
+  .auction-lots .pcard.lg { --card-w: 52px; --card-h: 62px; padding: 5px 2px 3px; }
   .auction-lots .pcard + .pcard { margin-left: -24px; }
   .auction-title { font-size: 16px; }
   .auction-type { font-size: 13px; }
+  /* one line: "Karl Gitter · Fixed Price" */
+  .auction-title, .auction-type { display: inline; }
+  .auction-type::before { content: " · "; }
+  .auction-type .long { display: none; }
+  /* grid so the Pass/Bid buttons sit beside the card, above the amount controls */
+  /* row spacing comes from margins on visible items only, so hidden controls leave no gaps */
+  .auction-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; row-gap: 0;
+    grid-template-areas: "head actions" "high high" "stepper stepper" "range range" "labels labels" "ok ok"; }
+  .auction-head { grid-area: head; min-width: 0; gap: 10px; }
+  .auction-high { grid-area: high; }
+  .bidder:not(.off) { display: contents; }
+  .bid-stepper { grid-area: stepper; }
+  #bidRange { grid-area: range; }
+  .bid-range-labels { grid-area: labels; margin-top: 4px; }
+  .auction-high, .bid-stepper, #bidRange, #btnOk { margin-top: 10px; }
+  .bid-actions { grid-area: actions; grid-template-columns: 1fr; gap: 6px; align-self: center; }
+  .bid-actions .btn { padding: 9px 12px; font-size: 14px; min-width: 96px; }
+  .bid-actions #btnBid { order: -1; }
+  #btnOk { grid-area: ok; }
   .bid-stepper button, #bidBox { height: 42px; }
   #bidRange { margin: 0; }
   body.mode-bid .hand-actions, body.mode-ok .hand-actions { display: none; }
@@ -336,7 +355,8 @@ svg { display: block; }
   .me .chips { grid-column: auto; justify-content: flex-end; }
   /* hand wraps into rows (never scrolls sideways): 2 rows of 6–7, or 3 rows of 6 for big hands */
   .hand { padding-top: 12px; gap: 6px; grid-template-columns: repeat(var(--cols, 6), minmax(0, 60px)); }
-  .hand .pcard { width: 100%; height: auto; aspect-ratio: 60 / 82; padding: 5px 2px 4px; }
+  .hand .pcard { width: 100%; height: auto; aspect-ratio: 60 / 72; padding: 5px 2px 3px; }
+  .pcard { justify-content: center; gap: 3px; }
   /* narrow cards switch to short artist codes (LM, YO, CP, KG, KR) */
   .hand .pcard, .auction-lots .pcard { container-type: inline-size; }
   @container (max-width: 62px) {

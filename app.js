@@ -353,7 +353,8 @@
     if (!A) return;
     $('#auctionLots').innerHTML = A.cards.map(c => pcard(c, { lg: true })).join('');
     $('#auctionTitle').textContent = (A.cards.length > 1 ? 'Double ' : '') + ARTISTS[artist(A.cards[0])];
-    $('#auctionType').textContent = A.type;
+    // "Fixed Price auction": the word "auction" is dropped on narrow screens to keep one line
+    $('#auctionType').innerHTML = A.type.endsWith(' auction') ? `${esc(A.type.slice(0, -8))}<span class="long"> auction</span>` : esc(A.type);
     $('#auctionSeller').textContent = A.seller === HUMAN ? 'You are the auctioneer' : `Auctioneer: ${NAMES[A.seller]}`;
     $('#auctionRule').textContent = RULE_TEXT[A.kind] || '';
     $('#highLabel').textContent = A.highLabel || 'High bid';
