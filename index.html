@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16161a" media="(prefers-color-scheme: dark)">
+<title>Modern Art</title>
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="mode-idle">
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>Modern Art</h1>
+      <div class="game-no" id="gameNo"></div>
+    </div>
+  </div>
+  <ol class="rounds" id="rounds" aria-label="Rounds"></ol>
+  <nav class="actions">
+    <button class="icon-btn" id="btnHistory" title="Game log" aria-label="Game log"></button>
+    <button class="icon-btn" id="btnRules" title="How to play" aria-label="How to play"></button>
+    <div class="menu-wrap">
+      <button class="icon-btn" id="btnMenu" title="New game" aria-label="New game menu" aria-haspopup="true"></button>
+      <div class="menu" id="menu" hidden>
+        <button data-cmd="new">New game</button>
+        <button data-cmd="specific">Play a game number…</button>
+        <button data-cmd="classic">Classic (2005) version</button>
+        <button data-cmd="about">About &amp; credits</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="prompt" id="prompt" role="status" aria-live="polite">
+  <div class="prompt-inner">
+    <span class="prompt-who" id="promptWho"></span>
+    <span class="prompt-text" id="promptText">Starting…</span>
+  </div>
+</div>
+
+<main class="layout">
+  <section class="opponents" id="opponents" aria-label="Opponents"></section>
+  <section class="market" id="market" aria-label="Artists"></section>
+
+  <aside class="side">
+    <section class="auction" id="auction" aria-label="Auction">
+      <div class="auction-empty" id="auctionEmpty">No auction in progress</div>
+      <div class="auction-body" id="auctionBody">
+        <div class="auction-head">
+          <div class="auction-lots" id="auctionLots"></div>
+          <div>
+            <div class="auction-title" id="auctionTitle"></div>
+            <div class="auction-type" id="auctionType"></div>
+            <div class="auction-seller" id="auctionSeller"></div>
+          </div>
+        </div>
+        <div class="auction-rule" id="auctionRule"></div>
+        <div class="auction-high">
+          <span class="label" id="highLabel">High bid</span>
+          <span class="amount" id="highAmount">—</span>
+          <span class="by" id="highBy"></span>
+          <span class="cash" id="myCash"></span>
+        </div>
+        <div class="bidder" id="bidder">
+          <div class="bid-stepper">
+            <button data-step="-10" aria-label="Minus 10">−10</button>
+            <button data-step="-1" aria-label="Minus 1">−1</button>
+            <input id="bidBox" inputmode="numeric" autocomplete="off" aria-label="Bid amount">
+            <button data-step="1" aria-label="Plus 1">+1</button>
+            <button data-step="10" aria-label="Plus 10">+10</button>
+          </div>
+          <input type="range" id="bidRange" aria-label="Bid slider">
+          <div class="bid-range-labels"><span id="bidMin"></span><button class="link" id="btnBidHint">Suggest a bid</button><span id="bidMax"></span></div>
+          <div class="bid-actions">
+            <button class="btn secondary" id="btnPass">Pass</button>
+            <button class="btn primary" id="btnBid">Bid</button>
+          </div>
+        </div>
+        <button class="btn primary wide" id="btnOk" hidden>Continue</button>
+      </div>
+    </section>
+    <section class="feed" aria-label="Recent events">
+      <h2>Recent</h2>
+      <ol id="feed"></ol>
+    </section>
+  </aside>
+</main>
+
+<footer class="dock" id="dock">
+  <div class="me">
+    <div class="avatar p4">D</div>
+    <div class="me-info">
+      <div class="me-name">You <span class="bid-pill" id="myLabel"></span></div>
+      <div class="me-money" id="myMoney"></div>
+    </div>
+    <div class="chips" id="myChips"></div>
+  </div>
+  <div class="hand-wrap">
+    <div class="hand" id="hand"></div>
+    <div class="hand-actions" id="handActions">
+      <button class="btn link-btn" id="btnCardHint">Suggest a painting</button>
+      <button class="btn secondary" id="btnCancelDouble" hidden>Cancel double</button>
+      <button class="btn secondary" id="btnNoSecond" hidden>No second card</button>
+      <button class="btn primary" id="btnPlay" hidden>Auction</button>
+      <button class="btn primary big" id="btnNewGameDock" hidden>New game</button>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle"></h2>
+    <div class="dialog-body" id="modalBody"></div>
+    <div class="dialog-buttons" id="modalButtons"></div>
+  </div>
+</div>
+
+<script src="weights.js"></script>
+<script src="ai.js"></script>
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

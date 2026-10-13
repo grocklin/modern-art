@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modern Art</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav id="menubar">
+  <div class="menu"><button class="menu-title">Game</button>
+    <div class="menu-items">
+      <button data-cmd="new">New Game</button>
+      <button data-cmd="specific">New Specific Game…</button>
+      <hr>
+      <button data-cmd="history">Game History</button>
+    </div>
+  </div>
+  <div class="menu"><button class="menu-title">Training</button>
+    <div class="menu-items">
+      <button data-cmd="hintCard" id="mnuHintCard" disabled>Propose painting to play</button>
+      <button data-cmd="hintBid" id="mnuHintBid" disabled>Propose bid</button>
+    </div>
+  </div>
+  <div class="menu"><button class="menu-title">Help</button>
+    <div class="menu-items">
+      <button data-cmd="rules">How to play Modern Art</button>
+      <hr>
+      <button data-cmd="modern">Modern version</button>
+      <hr>
+      <button data-cmd="about">About &amp; credits</button>
+    </div>
+  </div>
+  <span id="gameTitle">Modern Art</span>
+</nav>
+
+<main id="table">
+  <section class="player" id="p1" data-seat="left">
+    <div class="pname"></div>
+    <div class="handcount" title="Paintings in hand"></div>
+    <div class="bought"></div>
+  </section>
+
+  <section class="player" id="p2" data-seat="top">
+    <div class="pname"></div>
+    <div class="handcount" title="Paintings in hand"></div>
+    <div class="bought"></div>
+  </section>
+
+  <section class="player" id="p3" data-seat="right">
+    <div class="pname"></div>
+    <div class="handcount" title="Paintings in hand"></div>
+    <div class="bought"></div>
+  </section>
+
+  <section id="board"></section>
+
+  <section class="player" id="p4" data-seat="bottom">
+    <div class="you-head">
+      <div class="pname"></div>
+      <div class="bought"></div>
+    </div>
+    <div id="hand"></div>
+    <div id="secondButtons">
+      <button id="btnNoSecond">No Second Card</button>
+      <button id="btnCancelDouble">Cancel Double</button>
+    </div>
+  </section>
+
+  <section id="auction">
+    <div id="awArtist">Artist</div>
+    <div id="awType">Auction Type</div>
+    <div id="awSeller">Seller:</div>
+    <div id="awHigh">High:</div>
+    <div id="awPics"></div>
+    <div id="bidRow">
+      <div class="steppers"><button data-step="10" title="+10">⏶</button><button data-step="-10" title="−10">⏷</button></div>
+      <input id="bidBox" inputmode="numeric" autocomplete="off" aria-label="Bid amount">
+      <div class="steppers"><button data-step="1" title="+1">▲</button><button data-step="-1" title="−1">▼</button></div>
+      <div class="bidbtns">
+        <button id="btnBid">Bid</button>
+        <button id="btnPass">Pass</button>
+      </div>
+    </div>
+    <button id="btnOk">OK</button>
+  </section>
+</main>
+<div id="status">Choose Game ▸ New Game to begin.</div>
+
+<div id="modal" hidden>
+  <div class="dialog">
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+    <div id="modalButtons"></div>
+  </div>
+</div>
+
+<script src="weights.js"></script>
+<script src="ai.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
