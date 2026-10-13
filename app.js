@@ -42,7 +42,7 @@
     return {
       num, rng: mulberry32(num), cards: new Array(71).fill(0), money: [0, 100, 100, 100, 100],
       round: 1, tv, hist, turn: 0, labels: ['', '', '', '', ''], winner: 0, auction: null,
-      over: false, scored: false, endMsg: '', feed: [],
+      over: false, scored: false, endMsg: '', endMsgs: [], feed: [],
       // per round, per player: money earned as auctioneer and spent buying paintings
       flow: Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => ({ earned: 0, spent: 0, bank: 0 }))),
     };
@@ -450,6 +450,7 @@
       render();
       const ender = await playRound(turn);
       G.turn = ender;
+      G.endMsgs[round] = G.endMsg || `Round ${round} is over.`;
       const S = scoreRound();
       G.auction = null; clearLabels(); render();
       ui.status(G.endMsg || `Round ${round} is over.`);
@@ -477,6 +478,11 @@
     G.cards[card] = 9; if (second) G.cards[second] = 9;
     const what = typeOf(card) === 1 ? (second ? 'a double ' : 'a lone double ') : 'a ';
     G.endMsg = `${who(p)} ${p === HUMAN ? 'end' : 'ends'} the round by playing ${what}${ARTISTS[artist(card)]}.`;
+    const a = ARTISTS[artist(card)];
+    const an = w => (/^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`);
+    const how = typeOf(card) !== 1 ? an(`${KIND[typeOf(card)].toLowerCase()} ${a}`)
+      : second ? `a double ${a} with ${an(`${KIND[typeOf(second)].toLowerCase()} ${a}`)}` : `a lone double ${a}`;
+    G.hist[G.round][p] += `Ended the round by playing ${how} (5th ${a})\n`;
     return { ended: p };
   }
 
@@ -803,16 +809,35 @@
       <table class="table">${byRound}</table>`;
   }
 
+  // Round-by-round money breakdown: earned selling at auction, spent buying, bank sales.
+  function roundsBreakdownHTML() {
+    let rows = '';
+    for (let r = 1; r <= 4; r++) {
+      rows += `<tr class="round-head"><td colspan="5">Round ${r}</td></tr>`;
+      for (const p of [4, 1, 2, 3]) {
+        const f = G.flow[r][p];
+        rows += `<tr class="${p === HUMAN ? 'mine' : ''}"><td>${who(p)}</td>${moneyCell(f.earned)}${moneyCell(-f.spent)}${moneyCell(f.bank)}${moneyCell(f.earned - f.spent + f.bank, '', 'net')}</tr>`;
+      }
+    }
+    return `<table class="table flows">${FLOW_HEAD}${rows}</table>`;
+  }
+
   // Game log as formatted HTML: one section per round, a block per player.
   function historyHTML() {
     let h = `<p class="log-game">Game ${pad7(G.num)}${G.over ? ` · <b>${esc(G.result)}</b>` : ''}</p>`;
+    if (G.over) {
+      h += `<h3 class="log-round">Game summary</h3>${gameSummaryHTML()}
+        <h3>Round by round</h3>${roundsBreakdownHTML()}${FLOW_NOTE}`;
+    }
     for (let r = G.round; r >= 1; r--) { // most recent round first
-      h += `<h3 class="log-round">Round ${r}</h3><div class="log-grid">`;
+      h += `<h3 class="log-round">Round ${r}</h3>`;
+      if (G.endMsgs[r]) h += `<p class="log-note">${esc(G.endMsgs[r])}</p>`;
+      h += '<div class="log-grid">';
       for (const p of [4, 1, 2, 3]) {
         const lines = G.hist[r][p].split('\n').filter(Boolean);
         const items = lines.length ? lines.map(l => {
-          const total = /^Round \d+ total:/.test(l);
-          return `<li class="${total ? 'log-total' : ''}">${esc(l.replace(/^Round \d+ total:/, 'Round total:'))}</li>`;
+          const total = /^Round \d+ total:/.test(l), ended = /^Ended the round/.test(l);
+          return `<li class="${total ? 'log-total' : ended ? 'log-ended' : ''}">${esc(l.replace(/^Round \d+ total:/, 'Round total:'))}</li>`;
         }).join('') : '<li class="log-none">Nothing yet</li>';
         h += `<section class="log-player"><h4><span class="avatar p${p}">${NAMES[p][0]}</span>${who(p)}</h4><ul>${items}</ul></section>`;
       }

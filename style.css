@@ -401,3 +401,8 @@ svg { display: block; }
 .table.deck .chip { font-size: 12px; white-space: nowrap; }
 .table.deck tr.deck-total td { font-weight: 750; border-bottom: 0; }
 @media (max-width: 760px) { .table.deck th { font-size: 10px; } .table.deck .chip { font-size: 11px; padding: 2px 5px 2px 3px; } }
+
+.log-note { margin: -4px 0 10px; font-size: 13.5px; color: var(--ink-2); }
+.log-player li.log-ended { color: var(--ink); font-weight: 650; }
+.log-player li.log-ended::before { content: "⏹ "; color: var(--warn); }
+.table.flows tr.round-head td { font-weight: 750; color: var(--ink); background: var(--surface-2); padding-top: 6px; padding-bottom: 6px; }
