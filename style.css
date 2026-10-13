@@ -406,3 +406,10 @@ svg { display: block; }
 .log-player li.log-ended { color: var(--ink); font-weight: 650; }
 .log-player li.log-ended::before { content: "⏹ "; color: var(--warn); }
 .table.flows tr.round-head td { font-weight: 750; color: var(--ink); background: var(--surface-2); padding-top: 6px; padding-bottom: 6px; }
+
+/* reasons under a "suggest a painting" hint */
+.prompt-inner { flex-wrap: wrap; }
+.prompt-hint { flex-basis: 100%; margin: 4px 0 0; padding: 8px 0 0 18px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.prompt-hint li { margin: 2px 0; }
+.prompt-hint li::marker { color: var(--good); }
+@media (max-width: 760px) { .prompt-hint { font-size: 13px; padding-top: 6px; } }

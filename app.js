@@ -110,6 +110,7 @@
     },
     idle() {
       handMode = null; handResolve = null; selected = 0; bidState = null;
+      $('#promptHint').hidden = true;
       setMode('idle');
       $('#bidder').classList.add('off');
       $('#btnOk').hidden = true;
@@ -890,6 +891,73 @@
     runGame().catch(e => { if (!(e instanceof Abort)) { console.error(e); ui.status('Error: ' + e.message); } });
   }
 
+  // Current ranking this round: artists with at least one painting, most first, ties to the left.
+  function rankingWith(extra) {
+    const n = [0, 0, 0, 0, 0, 0];
+    for (let c = 1; c <= 70; c++) if (G.cards[c] >= 5 && G.cards[c] <= 9) n[artist(c)]++;
+    for (const [a, k] of extra) n[a] += k;
+    const order = [1, 2, 3, 4, 5].filter(a => n[a] > 0).sort((x, y) => n[y] - n[x] || x - y);
+    return { n, place: a => { const i = order.indexOf(a); return i >= 0 && i < 3 ? i + 1 : 0; } };
+  }
+  const PLACE = ['unplaced', '1st', '2nd', '3rd'];
+  const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
+  const theOwned = (k, A) => (k === 1 ? `the ${A} you bought` : `the ${k} ${A}s you bought`);
+
+  // Short, plain reasons why the AI likes `card`, built from the goals that contributed most to its score.
+  function cardReasons(card, second) {
+    const ex = AI.explainCard(HUMAN, card);
+    const a = artist(card), A = ARTISTS[a];
+    const hand = handOf(HUMAN).filter(c => c !== card && c !== second);
+    const owned = boughtCounts(HUMAN)[a];
+    const playCount = second ? 2 : 1;
+    const before = rankingWith([]), after = rankingWith([[a, playCount]]);
+    const pb = before.place(a), pa = after.place(a);
+    const value = (() => { let v = 0; for (let r = 1; r < G.round; r++) v += G.tv[r][a]; return v; })();
+    const reasons = [];
+
+    if (second) reasons.push({ w: 1e9, text: `Sold as a double with your ${KIND[typeOf(second)].toLowerCase()} ${A}, so you're paid for two paintings at once.` });
+    const lone = typeOf(card) === 1 && !second;
+    if (lone && before.n[a] + 1 < 5) reasons.push({ w: 1e9, text: `Played as a lone double: if nobody adds a ${A}, you get the double for free, and either way it counts toward ${A}'s ranking.` });
+    if (before.n[a] + playCount >= 5) reasons.push({ w: 1e9 - 1, text: `It's the 5th ${A}, so it ends the round right away and scores what everyone has bought.` });
+
+    const say = {
+      1: () => owned
+        ? (pa && (pb === 0 || pa < pb) ? `Moves ${A} ${pb ? `from ${PLACE[pb]} ` : ''}up to ${PLACE[pa]}, raising the value of ${theOwned(owned, A)}.`
+                                       : `Keeps ${A} ${PLACE[pa] || 'in contention'}, protecting ${theOwned(owned, A)}.`)
+        : `Helps the rankings of the artists you've bought this round.`,
+      2: () => owned
+        ? `Puts ${A} in a stronger position to place, which helps ${theOwned(owned, A)}.`
+        : `Improves the chances that the artists you've bought will place.`,
+      3: () => {
+        if (lone) return null; // you don't auction a lone double yourself
+        // what the other players would actually be willing to pay (the AIs' own bid valuations)
+        const bids = AI.aiBids(card, second, HUMAN);
+        const p = Math.max(bids[1], bids[2], bids[3]);
+        if (p <= 0) return null;
+        const why = value ? ` (${A} is already worth ${value} from earlier rounds)` : '';
+        return p >= 20 ? `Should sell well: other players would pay up to about $${p}${why}.`
+                       : `Other players would pay up to about $${p} for it${why}.`;
+      },
+      4: () => {
+        const k = hand.filter(c => artist(c) === a && typeOf(c) !== 1).length;
+        return k ? `Builds up ${A}, and you still hold ${k} more to sell later.` : null;
+      },
+      5: () => {
+        const k = hand.filter(c => artist(c) === a && typeOf(c) === 1).length;
+        return k ? `Raises ${A}'s value for your ${A} ${k === 1 ? 'double' : 'doubles'}, which sell${k === 1 ? 's' : ''} as two paintings later.` : null;
+      },
+    };
+    if (ex) {
+      for (const g of [...ex.goals].sort((x, y) => y.contribution - x.contribution)) {
+        if (g.contribution <= 0.5) break;
+        const t = say[g.goal]();
+        if (t) reasons.push({ w: g.contribution, text: t });
+      }
+    }
+    if (!reasons.length) reasons.push({ w: 0, text: `A low-risk play: it doesn't give much away to the other players this turn.` });
+    return reasons.sort((x, y) => y.w - x.w).slice(0, 3).map(r => r.text);
+  }
+
   function hintCard() {
     if (!G || !handMode || handMode.kind !== 'play') return;
     const rng = G.rng; G.rng = Math.random; // keep the game's random sequence untouched
@@ -897,10 +965,14 @@
     G.rng = rng;
     if (!pick) return;
     hintCards = [pick.card, pick.second];
-    let t = `The AI would auction ${ARTISTS[artist(pick.card)]} (${KIND[typeOf(pick.card)].toLowerCase()})`;
-    if (typeOf(pick.card) === 1) t += pick.second ? `, adding the ${KIND[typeOf(pick.second)].toLowerCase()} ${ARTISTS[artist(pick.second)]} outlined in yellow.` : ' as a lone double.';
-    else t += ' — outlined in green.';
+    let t = `Suggested: ${ARTISTS[artist(pick.card)]} (${KIND[typeOf(pick.card)].toLowerCase()})`;
+    if (typeOf(pick.card) === 1) t += pick.second ? `, with the ${KIND[typeOf(pick.second)].toLowerCase()} ${ARTISTS[artist(pick.second)]} outlined in yellow.` : ' as a lone double.';
+    else t += ', outlined in green.';
     ui.status(t);
+    const reasons = cardReasons(pick.card, pick.second);
+    const ul = $('#promptHint');
+    ul.innerHTML = reasons.map(r => `<li>${esc(r)}</li>`).join('');
+    ul.hidden = false;
     renderHand();
   }
 

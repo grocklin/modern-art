@@ -36,6 +36,7 @@
   // (Stale `neurons` values are read by SetUpHand in a few places — VB quirk.)
   const neurons = new Array(TN + 1).fill(0);
   const hand = [];
+  const weightsUsed = []; // weightsUsed[x][goal]: weight applied to each goal rating (for hint explanations only)
   for (let i = 0; i <= 17; i++) hand.push(new Array(NP + 3).fill(0));
 
   let G = null; // game state: {cards[71], money[5], round, tv[5][6], rng()}
@@ -344,10 +345,11 @@
         typeBonus(x);
 
         const wd = whichDecayOf();
+        weightsUsed[x] = [0, 0, 0, 0, 0, 0];
         for (let y = 1; y <= NP; y++) {
           if (R <= 3 || y < 4) {
             const k = coef(R, wd, y);
-            if (k > 0) hand[x][NP + 2] = f32(hand[x][NP + 2] + k * hand[x][1 + y]);
+            if (k > 0) { hand[x][NP + 2] = f32(hand[x][NP + 2] + k * hand[x][1 + y]); weightsUsed[x][y] = k; }
           }
         }
         if (isDbl) {
@@ -570,7 +572,22 @@
     return t;
   }
 
+  // For the "suggest a painting" hint: how much each of the five goals contributed to
+  // the AI's score for `card` (goal 1 owned-art value, 2 owned-art prospects, 3 sale
+  // price, 4 other cards of the artist in hand, 5 doubles in hand). Read-only.
+  function explainCard(who, card) {
+    const n = setUpHand(who, 0);
+    for (let x = 1; x <= n; x++) {
+      if (hand[x][1] !== card) continue;
+      const w = weightsUsed[x] || [0, 0, 0, 0, 0, 0];
+      const goals = [1, 2, 3, 4, 5].map(y => ({ goal: y, rating: hand[x][1 + y], contribution: w[y] * hand[x][1 + y] }));
+      return { goals, expectedPrice: hand[x][4], score: hand[x][NP + 2] };
+    }
+    return null;
+  }
+
   window.MA_AI = {
+    explainCard,
     artist, typeOf, cint, bind, countOut, pickACard, chooseSecond, aiBids, aiFixedPrice,
     bidHint, auctionParams, OWN_BID,
   };
