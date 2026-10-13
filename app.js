@@ -527,7 +527,12 @@
         const s = await ui.card({ kind: 'second', artist: a, exclude: card, canCancel: true, noneLabel: 'Auction double alone' });
         if (s === 'cancel') break;
         if (s === 'none') {
-          if (!(await ui.confirm(`Auction the ${ARTISTS[a]} double by itself? Going clockwise, each player may add a ${ARTISTS[a]} to it. The first to do so runs the auction and keeps all the money, and you lose your turn. If nobody adds one, you get the double for free.`, 'Auction alone', 'Go back'))) continue;
+          const A = ARTISTS[a];
+          const msg = out[a] === 3
+            // the double is the 4th of this artist, so a partner card would be the 5th
+            ? `This double is the 4th ${A} this round. Going clockwise, each player may add a ${A}, but that would be the 5th ${A}, so the round would end immediately: no auction, nobody is paid, and both paintings just count toward ${A}'s ranking. You lose your turn either way. If nobody adds one, you get the double for free.`
+            : `Auction the ${A} double by itself? Going clockwise, each player may add a ${A} to it. The first to do so runs the auction and keeps all the money, and you lose your turn. If nobody adds one, you get the double for free.`;
+          if (!(await ui.confirm(msg, 'Play double alone', 'Go back'))) continue;
           return loneDouble(HUMAN, card);
         }
         if (typeof s !== 'number' || artist(s) !== a || typeOf(s) === 1 || s === card) continue; // defensive
@@ -558,12 +563,14 @@
         for (;;) {
           const partners = handOf(HUMAN).filter(c => artist(c) === a && typeOf(c) !== 1);
           ui.status(partners.length
-            ? `${lead} Double-click one of your ${ARTISTS[a]} paintings to add it. You'd run the auction and keep all the money. Or pass.`
+            ? (out[a] === 3
+              ? `${lead} It's the 4th ${ARTISTS[a]}, so adding one of yours would be the 5th and end the round at once (no auction, nobody is paid). Double-click a ${ARTISTS[a]} to do that, or pass.`
+              : `${lead} Double-click one of your ${ARTISTS[a]} paintings to add it. You'd run the auction and keep all the money. Or pass.`)
             : `${lead} You have no ${ARTISTS[a]} to add, so you have to pass.`);
           const s = await ui.card({ kind: 'second', artist: a, noneLabel: partners.length ? "Don't add one" : 'Pass' });
           if (s === 'none') break;
           if (typeof s !== 'number' || artist(s) !== a || typeOf(s) === 1) continue; // defensive
-          if (out[a] === 3 && !(await ui.confirm(`That would be the 5th ${ARTISTS[a]}, which ends the round. End the round?`, 'End round'))) continue;
+          if (out[a] === 3 && !(await ui.confirm(`That would be the 5th ${ARTISTS[a]}, which ends the round immediately. There's no auction, so nobody is paid for these paintings. End the round?`, 'End round'))) continue;
           if (out[a] !== 3 && typeOf(s) === 3 && lowFixedWarning(s, true) &&
               !(await ui.confirm('The most you can charge for these fixed-price paintings is low. Auction them anyway?', 'Auction them'))) continue;
           second = s; break;
